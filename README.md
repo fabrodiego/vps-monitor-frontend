@@ -28,3 +28,5 @@ npm ci
 npm start            # http://localhost:4200, API em http://localhost:18080 (src/environments/environment.ts)
 npx ng build         # produção (API em src/environments/environment.production.ts)
 ```
+
+Teste de PR
