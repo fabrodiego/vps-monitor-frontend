@@ -36,7 +36,7 @@ import { UpdatedAt } from '../../shared/updated-at';
           <div class="row wrap claude-stats secondary small num">
             <span><b>{{ c.sessionsOpen }}</b> sessões</span>
             <span>RAM <b>{{ size(c.memoryBytes) }}</b></span>
-            <span>tokens 24h <b>{{ tok(c.tokens24h.total) }}</b></span>
+            <span>tokens 24h <b>{{ tok(c.tokens24h.fresh) }}</b></span>
             <span class="spacer"></span>
             <span class="muted">detalhes →</span>
           </div>

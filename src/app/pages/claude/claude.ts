@@ -38,8 +38,8 @@ import { UpdatedAt } from '../../shared/updated-at';
           <app-meter-tile label="Sessões abertas" [value]="'' + d.sessionsOpen" [sub]="busyText()" />
           <app-meter-tile label="RAM do Claude" [value]="size(d.memoryBytes)" [fraction]="d.memoryHostShare"
                           [sub]="pct(d.memoryHostShare) + ' da VPS · CPU ' + cpu(d.cpuCores)" />
-          <app-meter-tile label="Tokens 24h" [value]="tok(d.tokens24h.total)"
-                          [sub]="'saída ' + tok(d.tokens24h.output) + ' · cache ' + tok(d.tokens24h.cacheRead)" />
+          <app-meter-tile label="Tokens 24h" [value]="tok(d.tokens24h.fresh)"
+                          [sub]="'cache lido ' + tok(d.tokens24h.cacheRead) + ' · saída ' + tok(d.tokens24h.output)" />
         </div>
 
         <div class="card">
@@ -49,7 +49,7 @@ import { UpdatedAt } from '../../shared/updated-at';
               <thead>
                 <tr>
                   <th>Sessão</th><th>Estado</th><th>Contexto</th>
-                  <th class="r">Tokens</th><th class="r">Subagentes</th><th class="r">RAM</th><th class="r">CPU</th><th class="r">Aberta</th>
+                  <th class="r">Tokens novos</th><th class="r">Subagentes</th><th class="r">RAM</th><th class="r">CPU</th><th class="r">Aberta</th>
                 </tr>
               </thead>
               <tbody>
@@ -66,9 +66,9 @@ import { UpdatedAt } from '../../shared/updated-at';
                            [attr.aria-valuenow]="((s.contextUsage ?? 0) * 100).toFixed(0)" aria-label="Uso do contexto">
                         <span [style.width.%]="(s.contextUsage ?? 0) * 100"></span>
                       </div>
-                      <div class="xs secondary num">{{ tok(s.contextTokens) }} / {{ tok(s.contextLimit) }} ({{ pct(s.contextUsage, 0) }})</div>
+                      <div class="xs secondary num">{{ tok(s.contextTokens) }} / {{ tok(s.contextLimit) }} est. ({{ pct(s.contextUsage, 0) }})</div>
                     </td>
-                    <td class="r num" [title]="tokenTitle(s)">{{ tok(s.tokens.total) }}</td>
+                    <td class="r num" [title]="tokenTitle(s)">{{ tok(s.tokens.fresh) }}<div class="muted xs">+ {{ tok(s.tokens.cacheRead) }} cache</div></td>
                     <td class="r num">{{ tok(s.subagentTokens) }}</td>
                     <td class="r num">{{ size(s.memoryBytes) }}</td>
                     <td class="r num">{{ cpu(s.cpuCores) }}</td>
@@ -93,9 +93,9 @@ import { UpdatedAt } from '../../shared/updated-at';
                      [attr.aria-valuenow]="((s.contextUsage ?? 0) * 100).toFixed(0)" aria-label="Uso do contexto">
                   <span [style.width.%]="(s.contextUsage ?? 0) * 100"></span>
                 </div>
-                <div class="xs secondary num">contexto {{ tok(s.contextTokens) }} / {{ tok(s.contextLimit) }} ({{ pct(s.contextUsage, 0) }})</div>
+                <div class="xs secondary num">contexto {{ tok(s.contextTokens) }} / {{ tok(s.contextLimit) }} est. ({{ pct(s.contextUsage, 0) }})</div>
                 <div class="row wrap stats small secondary num">
-                  <span>tokens <b>{{ tok(s.tokens.total) }}</b></span>
+                  <span [title]="tokenTitle(s)">tokens novos <b>{{ tok(s.tokens.fresh) }}</b> <span class="muted xs extra">+ {{ tok(s.tokens.cacheRead) }} cache</span></span>
                   <span>subagentes <b>{{ tok(s.subagentTokens) }}</b></span>
                   <span>RAM <b>{{ size(s.memoryBytes) }}</b></span>
                   <span>CPU <b>{{ cpu(s.cpuCores) }}</b></span>
@@ -106,7 +106,7 @@ import { UpdatedAt } from '../../shared/updated-at';
             }
           </ul>
           <p class="muted xs note">
-            Tokens = entrada + saída + cache lido + cache gravado, incluindo os subagentes. O limite do contexto é uma estimativa feita pelo modelo.
+            Tokens novos = entrada + saída + cache gravado, incluindo os subagentes. Cache lido é o contexto relido a cada resposta e custa bem menos. O limite do contexto é uma estimativa feita pelo modelo.
           </p>
         </div>
       } @else if (claude.loading()) {
@@ -134,6 +134,7 @@ import { UpdatedAt } from '../../shared/updated-at';
     .grow { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .stats { gap: 14px; }
     .stats b { color: var(--text-primary); }
+    .extra { margin-left: 6px; }
     @media (max-width: 720px) {
       .wide { display: none; }
       .cards { display: block; }

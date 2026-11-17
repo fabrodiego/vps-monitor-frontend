@@ -107,6 +107,7 @@ export interface ClaudeTokens {
   output: number;
   cacheRead: number;
   cacheWrite: number;
+  fresh: number;
   total: number;
 }
 
