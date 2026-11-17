@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { ApiService } from '../../core/api.service';
-import { ago, bytes, ms, number, percent } from '../../core/format';
+import { RouterLink } from '@angular/router';
+import { ago, bytes, ms, number, percent, tokens } from '../../core/format';
 import { Alert, Site } from '../../core/models';
 import { poll } from '../../core/poll';
 import { Icon } from '../../shared/icon';
@@ -8,18 +9,41 @@ import { UpdatedAt } from '../../shared/updated-at';
 
 @Component({
   selector: 'app-services',
-  imports: [UpdatedAt, Icon],
+  imports: [UpdatedAt, Icon, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="page">
       <header class="page-header">
-        <h1>Sites, banco e alertas</h1>
+        <h1>Sites, banco, Claude e alertas</h1>
         <app-updated-at [at]="sites.updatedAt()" [loading]="sites.loading() || db.loading() || alerts.loading()" (refresh)="refreshAll()" />
       </header>
 
       @if (sites.error() || db.error() || alerts.error(); as e) {
         <div class="error-bar" role="alert"><app-icon name="alert" [size]="18" />{{ e }}</div>
       }
+
+      <a class="card claude-card" routerLink="/servicos/claude" aria-label="Ver detalhes do Claude">
+        <div class="row claude-head">
+          <app-icon name="terminal" [size]="18" />
+          <h2 class="card-title">Claude</h2>
+          <span class="spacer"></span>
+          @if (claude.data(); as c) {
+            <span class="status" [class.good]="c.remoteControlUp && c.exporterUp" [class.crit]="!c.remoteControlUp || !c.exporterUp">
+              {{ !c.exporterUp ? 'sem dados' : c.remoteControlUp ? 'celular no ar' : 'celular parado' }}</span>
+          }
+        </div>
+        @if (claude.data(); as c) {
+          <div class="row wrap claude-stats secondary small num">
+            <span><b>{{ c.sessionsOpen }}</b> sessões</span>
+            <span>RAM <b>{{ size(c.memoryBytes) }}</b></span>
+            <span>tokens 24h <b>{{ tok(c.tokens24h.total) }}</b></span>
+            <span class="spacer"></span>
+            <span class="muted">detalhes →</span>
+          </div>
+        } @else {
+          <div class="muted small">{{ claude.error() ?? 'Carregando…' }}</div>
+        }
+      </a>
 
       <div class="card">
         <h2 class="card-title">Alertas</h2>
@@ -100,6 +124,12 @@ import { UpdatedAt } from '../../shared/updated-at';
     .warn-txt { color: var(--warning); font-weight: 600; }
     .lock { display: inline-flex; vertical-align: -2px; margin-left: 4px; }
     .db-head { margin-bottom: 4px; gap: 10px; }
+    .claude-card { display: block; color: inherit; text-decoration: none; transition: border-color 0.2s, box-shadow 0.2s; }
+    .claude-card:hover, .claude-card:focus-visible { border-color: var(--brand-blue); box-shadow: var(--glow); }
+    .claude-head { gap: 10px; margin-bottom: 8px; color: var(--brand-cyan); }
+    .claude-head .card-title { margin: 0; color: var(--text-primary); }
+    .claude-stats { gap: 16px; }
+    .claude-stats b { color: var(--text-primary); }
     .db-head .card-title { margin: 0; }
   `,
 })
@@ -109,6 +139,7 @@ export class ServicesPage {
   protected readonly sites = poll(() => this.api.sites(), 30_000);
   protected readonly db = poll(() => this.api.database(), 30_000);
   protected readonly alerts = poll(() => this.api.alerts(), 15_000);
+  protected readonly claude = poll(() => this.api.claude(), 30_000);
 
   protected readonly totalConn = computed(() => (this.db.data()?.databases ?? []).reduce((s, b) => s + b.connections, 0));
 
@@ -116,6 +147,7 @@ export class ServicesPage {
     this.sites.refresh();
     this.db.refresh();
     this.alerts.refresh();
+    this.claude.refresh();
   }
 
   protected alertClass(a: Alert): string {
@@ -156,4 +188,5 @@ export class ServicesPage {
   protected size = bytes;
   protected time = ms;
   protected pct = percent;
+  protected tok = tokens;
 }

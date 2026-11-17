@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Alert, AppsResponse, DatabaseResponse, Overview, PodsResponse, SeriesMetric, SeriesRange, SeriesResponse, Site } from './models';
+import { Alert, AppsResponse, ClaudeResponse, DatabaseResponse, Overview, PodsResponse, SeriesMetric, SeriesRange, SeriesResponse, Site } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -34,5 +34,9 @@ export class ApiService {
 
   alerts() {
     return this.http.get<Alert[]>(`${this.base}/alerts`);
+  }
+
+  claude() {
+    return this.http.get<ClaudeResponse>(`${this.base}/claude`);
   }
 }

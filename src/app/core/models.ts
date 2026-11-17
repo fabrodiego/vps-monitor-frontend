@@ -101,3 +101,40 @@ export interface Alert {
 export interface PodsResponse {
   pods: Pod[];
 }
+
+export interface ClaudeTokens {
+  input: number;
+  output: number;
+  cacheRead: number;
+  cacheWrite: number;
+  total: number;
+}
+
+export interface ClaudeSession {
+  id: string;
+  name: string;
+  status: 'busy' | 'idle' | string;
+  origin: string;
+  model: string;
+  memoryBytes: number | null;
+  cpuCores: number | null;
+  processes: number | null;
+  startedAt: number | null;
+  contextTokens: number | null;
+  contextLimit: number;
+  contextUsage: number | null;
+  tokens: ClaudeTokens;
+  subagentTokens: number | null;
+  turns: number | null;
+}
+
+export interface ClaudeResponse {
+  exporterUp: boolean;
+  remoteControlUp: boolean;
+  sessionsOpen: number;
+  memoryBytes: number | null;
+  memoryHostShare: number | null;
+  cpuCores: number | null;
+  tokens24h: ClaudeTokens;
+  sessions: ClaudeSession[];
+}

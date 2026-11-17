@@ -13,6 +13,7 @@ export const routes: Routes = [
       { path: 'apps', loadComponent: () => import('./pages/apps/apps').then((m) => m.AppsPage), title: 'Apps · VPS Monitor' },
       { path: 'pods', loadComponent: () => import('./pages/pods/pods').then((m) => m.PodsPage), title: 'Pods · VPS Monitor' },
       { path: 'servicos', loadComponent: () => import('./pages/services/services').then((m) => m.ServicesPage), title: 'Serviços · VPS Monitor' },
+      { path: 'servicos/claude', loadComponent: () => import('./pages/claude/claude').then((m) => m.ClaudePage), title: 'Claude · VPS Monitor' },
     ],
   },
   { path: '**', redirectTo: '' },
