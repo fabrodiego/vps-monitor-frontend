@@ -72,3 +72,11 @@ export function level(fraction: number | null | undefined, warn = 0.75, crit = 0
   if (fraction == null) return 'ok';
   return fraction >= crit ? 'crit' : fraction >= warn ? 'warn' : 'ok';
 }
+
+/** Tokens: 1234 -> "1,2 mil", 2_500_000 -> "2,5 mi". */
+export function tokens(v: number | null | undefined): string {
+  if (v == null || !isFinite(v)) return DASH;
+  if (v >= 1_000_000) return `${nf1.format(v / 1_000_000)} mi`;
+  if (v >= 1_000) return `${nf1.format(v / 1_000)} mil`;
+  return nf0.format(v);
+}

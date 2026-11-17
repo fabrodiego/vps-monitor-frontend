@@ -103,6 +103,6 @@ export class Shell {
     { path: '/', label: 'Visão geral', short: 'Geral', icon: 'dashboard' },
     { path: '/apps', label: 'Apps e processos', short: 'Apps', icon: 'apps' },
     { path: '/pods', label: 'Pods / k3s', short: 'Pods', icon: 'box' },
-    { path: '/servicos', label: 'Sites, banco e alertas', short: 'Serviços', icon: 'globe' },
+    { path: '/servicos', label: 'Sites, banco, Claude e alertas', short: 'Serviços', icon: 'globe' },
   ];
 }
